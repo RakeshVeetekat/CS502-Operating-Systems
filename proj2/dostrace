@@ -1,0 +1,6 @@
+#! /bin/sh
+# dostrace cmd [args]
+# run the command with stderr from strace going to logfile
+LOGFILE="`basename $1`.slog"
+strace $* 2> $LOGFILE 
+echo "strace output in $LOGFILE"

@@ -1,0 +1,30 @@
+Write a C program that solves the following problem.
+
+The purpose of this project is twofold. First, you will compare the performance of standard file I/O using the read() system call for input with memory-mapped I/O where the mmap() system call allows the contents of a file to be mapped to memory. Access to the file is then controlled by the virtual memory manager of the operating system. In both cases, you will
+need to use the open() and close() system calls for opening and closing the file for I/O. Second, you will extend the memory-mapped portion of your project to parallelize the
+processing of memory amongst multiple threads. For this portion of the project, ideally you will run your program where you have multiple-core machines and a controlled environment for testing. For the project, you should write a program proj6 that will behave similar to the strings command available in Linux. This command prints all strings of printable characters with length four (the default) or more. You should try executing the strings command on a few files to get a sense of the type of strings that are embedded in various types of files. For your project, you do not need to print the strings of characters, but instead you will determine how many such strings of at least four characters exist, along with the longest such string. Your program takes a file name as command-line argument and determines strings of printable characters in the file. Printable characters occur if they match one of two routines: isprint(), which determines if a byte value is a printable character; and isspace(), which determines if a byte is a space, newline, tab, etc. Check the man pages of these routines for details and the needed include file. Please note that the strings of characters that you find will not be NULL-terminated strings as used in C/C++, but rather these strings will terminate when followed by a non- printable byte that occurs in the file. The following shows sample output from two executions of your program:
+
+% ./proj6 proj6
+File size: 12969 bytes.
+Strings of at least length 4: 218
+Maximum string length: 68 bytes
+
+% ./proj6 proj.cpp
+File size: 2894 bytes.
+Strings of at least length 4: 1
+Maximum string length: 2894 bytes
+
+In the first execution, the program is run on its own executable file. In this case there are many non-printable characters in the file with 218 strings of at least length 4 found. The longest such string is 68 bytes. In the second execution, the program is run on a source file where all bytes in the file are printable. In this case, there is only one string, which is the length of the file.
+
+Now that we have described the functionality of your program, which will require all bytes of the input file to be read, the remainder of the project focuses on how your program reads the input. The default behavior of the program should be to read bytes from the file in chunks of 1024 bytes using the read() system call (sample usage in fileio.cpp). However your program should have an optional second argument that controls the chunk size for reading or to tell the program to use memory-mapped file I/O. In the latter case your program should map the entire contents of the file to memory. The syntax of your program:
+
+% proj6 srcfile [size|mmap]
+
+where srcfile is the file on which to determine the strings of printable characters. If the optional second argument is an integer then it is the size of bytes to use on each loop when reading the file using the read() system call. Your program should enforce a chunk size limit of no more than 8192 (8K) bytes. Your program should traverse the buffer of bytes read on each iteration and keep track of printable strings as described above. If an optional second argument is the literal string “mmap” then your program should not use the read() system call, but rather use the mmap() system call to map the contents of srcfile to memory. You should look at the man pages for mmap() and munmap() as well as the sample program mmapexample.cpp for help in using these system calls. Once your program has mapped the file to memory then it should iterate through all bytes in memory to determine strings of printable characters. You should verify that the file I/O and memory mapped options of your program show the same output for the same file as a minimal test of correctness.
+
+You need to extend your program to allow the memory-mapped portion of the project to be parallelized. For this portion you need to allow an additional command line option of the form “pn” where n is the number of parallel threads. Your program should allow no more than 16 parallel threads. Thus a command line such as:
+
+% ./proj6 proj6.cpp p4
+
+should cause four threads to be created where each thread processes a chunk that is one-fourth of the file contents. You should divide the work amongst the threads in such a manner to provide the best performance. Once each thread is completed you need to combine the results from each thread. You need to give careful thought how to combine results as a string may start in the chunk of memory processed by one thread and end in the chunk processed by another thread. A string may also extend across the entire chunk for a thread. You want to make your parallelized program as fast as possible so minimize or eliminate cases where threads must access shared resources. The output of the parallelized approach should be identical to the output for the other approaches. All approaches should be contained within the same executable with the command line controlling which approach is used.
+

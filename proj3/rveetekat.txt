@@ -1,0 +1,115 @@
+Grader: Yongcheng Liu
+
+Score: 18
+
+
+Comments:
+------------------------------------
+
+Part I: Code Inspection and Basic Checking - Part Grade:12/12
+The code is well commented. Well done! (1/1)
+
+The code has checked the command argument to not exceed MAXTHREAD. Well done! (1/1)
+
+The code checked to ensure that the first argument in input is non-negative. However, the expected behavior is to skip such lines instead of early exiting. I will not take points off this time as code demonstrated considering such cases. Please read instructions more carefully next time: (1/1)
+$ ./mailbox 1
+
+Number of threads: 1
+
+Initializing thread 0
+Initializing thread 1
+3 1
+-1 1
+All messages could be sent.
+The result from thread 1 is 3 from 1 operations during 5 seconds
+Threads have terminated. Exiting program
+
+The code has checked to ensure that the second argument in input should be in range from 1..<Initialized_Threads> and skip erronous lines. Well done! (1/1)
+
+The code has used sem_init, sem_wait, and sem_post to guard the resources. Well done! (4/4)
+
+The code has used semaphores, similar to producer/consumer problem, at appropriate locations, and the output from the basic tests are correct. However, please know that there is no need to have mutex version of the lock simultaneously. Two semaphores will be sufficient. Overall, well done! (4/4)
+
+------------------------------------
+
+Part II: Blocking Mode Tests - Part Grade:6/9
+First, there is no sleep() or similar function to simulate work in the implementaiton, making all time spent to be 0 seconds, so I have to manually add in a sleep(1) for testing. Please read the handout more carefully next time to make sure not omitting critical things like "sleep() to simulate work". No points will be deducted since this is not a major point.
+
+For the blocking mode tests: 
+The code has passed the simple testcase in blocking mode with 1 worker thread. Well done! (3/3)
+
+The code did not pass the medium testcase in blocking mode with 3 worker threads (the one in the handout). Test results: (2/3)
+$ ./mailbox 3
+
+Number of threads: 3
+
+Initializing thread 0
+Initializing thread 1
+Initializing thread 2
+Initializing thread 3
+3 1
+4 2
+6 1
+5 1
+7 3
+9 2
+All messages could be sent.
+The result from thread 3 is 7 from 1 operations during 7 seconds
+The result from thread 1 is 3 from 1 operations during 7 seconds
+The result from thread 2 is 13 from 2 operations during 8 seconds
+Threads have terminated. Exiting program
+
+=> The result for thread 1 should be 14. Somehow the program only processed the first input but not the consequtive ones. -1 for this bug.
+
+The code did not pass the complex testcase in blocking mode with 5 worker threads. Test results: (1/3)
+$ ./mailbox 5
+
+Number of threads: 5
+
+Initializing thread 0
+Initializing thread 1
+Initializing thread 2
+Initializing thread 3
+Initializing thread 4
+Initializing thread 5
+1 1
+2 2
+3 3
+4 4
+5 5
+1 1
+2 2
+4 4
+3 3
+4 4
+5 5
+4 4
+1 1
+2 2
+3 3
+4 4
+All messages could be sent.
+The result from thread 1 is 2 from 2 operations during 7 seconds
+The result from thread 4 is 8 from 2 operations during 7 seconds
+The result from thread 2 is 4 from 2 operations during 7 seconds
+The result from thread 3 is 6 from 2 operations during 7 seconds
+The result from thread 5 is 10 from 2 operations during 7 seconds
+Threads have terminated. Exiting program
+
+=> The result should be 3 for thread 1, 6 for thread 2, and 9 for thread 3. It seems that the program did not execute the last operation for each of these threads. Additionally, the result should be 20 for thread 4. It seems that the operations of any thread are capped by the minumal number of operations in any thread. 
+
+------------------------------------
+
+Part III: Non Blocking Implementation and Tests - Part Grade:1/4
+I can see that you have implementations for Non-blocking mode. However, the expected way to invoke non-blocking mode is to execute ./mailbox <thread_num> nb. I did not find the flag or condition checking statement to determine if the program should enter the non-blocking mode or not. The program should be able to support non-blocking mode (./mailbox <thread_num> nb) and blocking mode (./mailbox <thread_num) without nb argument simultaneously.
+
+Additionally, the program only checks if argc == 2. Therefore, if I do ./mailbox <thread_num> nb, then the program will just create MAXTHREAD threads.
+
+The implementation of NBSendMsg used sem_trywait and a queue for undelivered messages. Well done. I will give you one point for this. (1/1)
+
+However, for the rest of the points for the three additional tests, as your program does not explicitly support non-blocking mode and there is no easy way for me to modify your code to support it, all tests for non-blocking mode are considered failed. (0/3)
+
+------------------------------------
+
+Late time: Submitted 0 days, 23 hours, 13 minutes, and 19 seconds late.
+Late deduction: -1
